@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["answers"],
+  "properties": {
+    "answers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trace_diagnosis",
+        "metric_diagnosis",
+        "trace_repair",
+        "metric_repair",
+        "before_trace_evidence",
+        "after_trace_evidence",
+        "before_metric_evidence",
+        "after_metric_evidence"
+      ],
+      "properties": {
+        "trace_diagnosis": { "type": "string", "minLength": 40, "maxLength": 500 },
+        "metric_diagnosis": { "type": "string", "minLength": 40, "maxLength": 500 },
+        "trace_repair": { "type": "string", "minLength": 100, "maxLength": 1000 },
+        "metric_repair": { "type": "string", "minLength": 100, "maxLength": 1000 },
+        "before_trace_evidence": { "type": "string", "minLength": 40, "maxLength": 1000 },
+        "after_trace_evidence": { "type": "string", "minLength": 40, "maxLength": 1000 },
+        "before_metric_evidence": { "type": "string", "minLength": 40, "maxLength": 1000 },
+        "after_metric_evidence": { "type": "string", "minLength": 40, "maxLength": 1000 }
+      }
+    }
+  }
+}

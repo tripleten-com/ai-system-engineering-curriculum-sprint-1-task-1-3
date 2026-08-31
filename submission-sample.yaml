@@ -1,0 +1,29 @@
+# Coldline - Task 1.3
+# File: submission-sample.yaml
+# Component: Fictional answer example
+# Purpose: Show the required answer shape without giving Task answers.
+# Interacts With: Submission schema and public verifier
+# Sprint/Task: Sprint 1 - Project 1 / Task 1.3
+# Concepts: Evidence structure
+# Tools: YAML
+
+# Fictional shape example only. These answers do not describe Coldline.
+answers:
+  trace_diagnosis: |
+    The fictional worker never extracted trace context from the fictional queue message.
+  metric_diagnosis: |
+    The fictional latency metric attached a unique fictional ID as a label.
+  trace_repair: |
+    Injected the fictional trace context into the fictional message at publish time and
+    extracted it as the parent span at consume time.
+  metric_repair: |
+    Removed the fictional unique-ID label from the fictional metric and kept only a bounded
+    fictional status label; also fixed the fictional metric's unit.
+  before_trace_evidence: |
+    Fictional worker span showed a new root Trace ID unrelated to the fictional API trace.
+  after_trace_evidence: |
+    Fictional worker span now appears as a child of the fictional API trace.
+  before_metric_evidence: |
+    Fictional metric endpoint showed one time series per fictional request.
+  after_metric_evidence: |
+    Fictional metric endpoint now shows one bounded time series per status value.
