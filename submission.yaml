@@ -1,38 +1,111 @@
 # Coldline - Task 1.3
 # File: submission.yaml
-# Component: Student answer sheet
-# Purpose: Record the Task 1.3 observability repair.
-# Interacts With: Submission schema and public verifier
-# Sprint/Task: Sprint 1 - Project 1 / Task 1.3
-# Concepts: Distributed tracing, metric cardinality
+# Component: Structured student answer sheet
+# Purpose: Record bounded evidence interpretations.
+# Interacts With: Public schema and protected checker
+# Sprint/Task: Sprint 1 / Task 1.3
+# Concepts: Evidence interpretation and deterministic assessment
 # Tools: YAML
-
-# Complete each answer after fixing both telemetry defects.
-# Empty values and placeholder text fail public verification.
-# Do not submit secrets, personal data, local absolute paths, or protected evaluator details.
-# See submission-sample.yaml for a completed fictional shape.
+# Use docs/student/evidence-pack.json for graded analysis.
+# Local experiments remain required practical work and final defense evidence.
+# Blank values are incomplete; no free-text field is graded.
+# Complete answers.
 answers:
-  # 40-500 characters.
-  trace_diagnosis: |
-    Replace this line with your trace defect diagnosis.
-  # 40-500 characters.
-  metric_diagnosis: |
-    Replace this line with your metric defect diagnosis.
-  # 100-1000 characters.
-  trace_repair: |
-    Replace this line with a description of your trace repair.
-  # 100-1000 characters.
-  metric_repair: |
-    Replace this line with a description of your metric repair.
-  # 40-1000 characters.
-  before_trace_evidence: |
-    Replace this line with your "before" trace evidence.
-  # 40-1000 characters.
-  after_trace_evidence: |
-    Replace this line with your "after" trace evidence.
-  # 40-1000 characters.
-  before_metric_evidence: |
-    Replace this line with your "before" metric evidence.
-  # 40-1000 characters.
-  after_metric_evidence: |
-    Replace this line with your "after" metric evidence.
+  # Complete trace diagnosis.
+  trace_diagnosis:
+    # Faulty context propagation boundary.
+    # Choices: api-to-queue-to-worker, worker-to-model, api-to-database
+    boundary:
+    # Cause visible in queue source.
+    # Choices: not-injected-or-restored, propagated-correctly, invalid-job-json
+    carrier:
+    # How the starter creates the processing span.
+    # Choices: not-extracted, extracted-parent, no-worker-tracer
+    worker_context:
+    # Classify the explanation that these source defects cause separate runtime traces.
+    # Choices: observation, inference, not-established
+    causal_claim:
+  # Complete metric diagnosis.
+  metric_diagnosis:
+    # Starter observation conversion.
+    # Choices: seconds-multiplied-by-1000, seconds-divided-by-1000, correct-seconds
+    unit_fault:
+    # Starter dimension responsible for growth.
+    # Choices: per-exception-request-id, bounded-route, none
+    cardinality_fault:
+    # Effect of the combined defects.
+    # Choices: new-series-per-exception-and-inflated-duration, missing-database-row, no-impact
+    impact:
+  # Complete before trace evidence.
+  before_trace_evidence:
+    # Compare actual publisher and processing span trace IDs and CHILD_OF references.
+    # Choices: single-parent-chain, separate-traces, no-worker-span
+    continuity:
+    # Parent of model_provider.summarize.
+    # Choices: worker-processing, api-request, no-parent
+    model_parent:
+    # Shared durable identity linking HTTP, stream, worker and saved record.
+    # Choices: exception-id, timestamp-proximity, no-shared-identity
+    correlation_basis:
+    # Classification of the trace relationship directly visible in this capture.
+    # Choices: observation, inference, not-established
+    classification:
+  # Complete after trace evidence.
+  after_trace_evidence:
+    # Compare actual publisher and processing span trace IDs and CHILD_OF references.
+    # Choices: single-parent-chain, separate-traces, no-worker-span
+    continuity:
+    # Parent of model_provider.summarize.
+    # Choices: worker-processing, api-request, no-parent
+    model_parent:
+    # Shared durable identity linking HTTP, stream, worker and saved record.
+    # Choices: exception-id, timestamp-proximity, no-shared-identity
+    correlation_basis:
+    # Classification of the trace relationship directly visible in this capture.
+    # Choices: observation, inference, not-established
+    classification:
+  # Complete before metric evidence.
+  before_metric_evidence:
+    # Unit of observations, considering source and accepted-to-terminal timestamps.
+    # Choices: seconds, milliseconds, unknown
+    recorded_unit:
+    # Application labels on the histogram, excluding Prometheus job/instance and bucket le.
+    # Choices: none, request_id, shipment_id
+    application_labels:
+    # Captured response to the published dashboard query.
+    # Choices: empty-vector, finite-seconds-value, query-error
+    dashboard_result:
+    # Classification of the query result directly visible in this capture.
+    # Choices: observation, inference, not-established
+    classification:
+  # Complete after metric evidence.
+  after_metric_evidence:
+    # Unit of observations, considering source and accepted-to-terminal timestamps.
+    # Choices: seconds, milliseconds, unknown
+    recorded_unit:
+    # Application labels on the histogram, excluding Prometheus job/instance and bucket le.
+    # Choices: none, request_id, shipment_id
+    application_labels:
+    # Captured response to the published dashboard query.
+    # Choices: empty-vector, finite-seconds-value, query-error
+    dashboard_result:
+    # Classification of the query result directly visible in this capture.
+    # Choices: observation, inference, not-established
+    classification:
+  # Complete behavior and limits.
+  behavior_and_limits:
+    # Terminal state in both captures.
+    # Choices: COMPLETED, FAILED, QUEUED
+    exception_state:
+    # In-range POST status in both captures.
+    # Choices: 200, 202, 422, 500
+    normal_http_status:
+    # Compare captured summaries for the same synthetic shipment and temperature.
+    # Choices: unchanged-for-equivalent-input, missing-after, different-condition
+    summary_comparison:
+    # Classification of the captured state/status/summary comparison.
+    # Choices: observation, inference, not-established
+    business_claim_classification:
+    # Does the pack establish the production p95 latency SLO?
+    # Choices: observation, inference, not-established
+    production_slo_claim:

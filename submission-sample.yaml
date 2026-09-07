@@ -1,29 +1,113 @@
 # Coldline - Task 1.3
 # File: submission-sample.yaml
-# Component: Fictional answer example
-# Purpose: Show the required answer shape without giving Task answers.
-# Interacts With: Submission schema and public verifier
-# Sprint/Task: Sprint 1 - Project 1 / Task 1.3
-# Concepts: Evidence structure
+# Component: Structured student answer sheet
+# Purpose: Record bounded evidence interpretations.
+# Interacts With: Public schema and protected checker
+# Sprint/Task: Sprint 1 / Task 1.3
+# Concepts: Evidence interpretation and deterministic assessment
 # Tools: YAML
-
-# Fictional shape example only. These answers do not describe Coldline.
+# Use docs/student/evidence-pack.json for graded analysis.
+# Local experiments remain required practical work and final defense evidence.
+# Blank values are incomplete; no free-text field is graded.
+# Fictional shape only, deliberately incorrect for this Task.
+# sample-only never identifies evidence in the supplied pack.
+# Complete answers.
 answers:
-  trace_diagnosis: |
-    The fictional worker never extracted trace context from the fictional queue message.
-  metric_diagnosis: |
-    The fictional latency metric attached a unique fictional ID as a label.
-  trace_repair: |
-    Injected the fictional trace context into the fictional message at publish time and
-    extracted it as the parent span at consume time.
-  metric_repair: |
-    Removed the fictional unique-ID label from the fictional metric and kept only a bounded
-    fictional status label; also fixed the fictional metric's unit.
-  before_trace_evidence: |
-    Fictional worker span showed a new root Trace ID unrelated to the fictional API trace.
-  after_trace_evidence: |
-    Fictional worker span now appears as a child of the fictional API trace.
-  before_metric_evidence: |
-    Fictional metric endpoint showed one time series per fictional request.
-  after_metric_evidence: |
-    Fictional metric endpoint now shows one bounded time series per status value.
+  # Complete trace diagnosis.
+  trace_diagnosis:
+    # Faulty context propagation boundary.
+    # Choices: api-to-queue-to-worker, worker-to-model, api-to-database
+    boundary: "api-to-queue-to-worker"
+    # Cause visible in queue source.
+    # Choices: not-injected-or-restored, propagated-correctly, invalid-job-json
+    carrier: "not-injected-or-restored"
+    # How the starter creates the processing span.
+    # Choices: not-extracted, extracted-parent, no-worker-tracer
+    worker_context: "not-extracted"
+    # Classify the explanation that these source defects cause separate runtime traces.
+    # Choices: observation, inference, not-established
+    causal_claim: "observation"
+  # Complete metric diagnosis.
+  metric_diagnosis:
+    # Starter observation conversion.
+    # Choices: seconds-multiplied-by-1000, seconds-divided-by-1000, correct-seconds
+    unit_fault: "seconds-multiplied-by-1000"
+    # Starter dimension responsible for growth.
+    # Choices: per-exception-request-id, bounded-route, none
+    cardinality_fault: "per-exception-request-id"
+    # Effect of the combined defects.
+    # Choices: new-series-per-exception-and-inflated-duration, missing-database-row, no-impact
+    impact: "new-series-per-exception-and-inflated-duration"
+  # Complete before trace evidence.
+  before_trace_evidence:
+    # Compare actual publisher and processing span trace IDs and CHILD_OF references.
+    # Choices: single-parent-chain, separate-traces, no-worker-span
+    continuity: "single-parent-chain"
+    # Parent of model_provider.summarize.
+    # Choices: worker-processing, api-request, no-parent
+    model_parent: "worker-processing"
+    # Shared durable identity linking HTTP, stream, worker and saved record.
+    # Choices: exception-id, timestamp-proximity, no-shared-identity
+    correlation_basis: "exception-id"
+    # Classification of the trace relationship directly visible in this capture.
+    # Choices: observation, inference, not-established
+    classification: "observation"
+  # Complete after trace evidence.
+  after_trace_evidence:
+    # Compare actual publisher and processing span trace IDs and CHILD_OF references.
+    # Choices: single-parent-chain, separate-traces, no-worker-span
+    continuity: "single-parent-chain"
+    # Parent of model_provider.summarize.
+    # Choices: worker-processing, api-request, no-parent
+    model_parent: "worker-processing"
+    # Shared durable identity linking HTTP, stream, worker and saved record.
+    # Choices: exception-id, timestamp-proximity, no-shared-identity
+    correlation_basis: "exception-id"
+    # Classification of the trace relationship directly visible in this capture.
+    # Choices: observation, inference, not-established
+    classification: "observation"
+  # Complete before metric evidence.
+  before_metric_evidence:
+    # Unit of observations, considering source and accepted-to-terminal timestamps.
+    # Choices: seconds, milliseconds, unknown
+    recorded_unit: "seconds"
+    # Application labels on the histogram, excluding Prometheus job/instance and bucket le.
+    # Choices: none, request_id, shipment_id
+    application_labels: "none"
+    # Captured response to the published dashboard query.
+    # Choices: empty-vector, finite-seconds-value, query-error
+    dashboard_result: "empty-vector"
+    # Classification of the query result directly visible in this capture.
+    # Choices: observation, inference, not-established
+    classification: "observation"
+  # Complete after metric evidence.
+  after_metric_evidence:
+    # Unit of observations, considering source and accepted-to-terminal timestamps.
+    # Choices: seconds, milliseconds, unknown
+    recorded_unit: "seconds"
+    # Application labels on the histogram, excluding Prometheus job/instance and bucket le.
+    # Choices: none, request_id, shipment_id
+    application_labels: "none"
+    # Captured response to the published dashboard query.
+    # Choices: empty-vector, finite-seconds-value, query-error
+    dashboard_result: "empty-vector"
+    # Classification of the query result directly visible in this capture.
+    # Choices: observation, inference, not-established
+    classification: "observation"
+  # Complete behavior and limits.
+  behavior_and_limits:
+    # Terminal state in both captures.
+    # Choices: COMPLETED, FAILED, QUEUED
+    exception_state: "COMPLETED"
+    # In-range POST status in both captures.
+    # Choices: 200, 202, 422, 500
+    normal_http_status: 200
+    # Compare captured summaries for the same synthetic shipment and temperature.
+    # Choices: unchanged-for-equivalent-input, missing-after, different-condition
+    summary_comparison: "unchanged-for-equivalent-input"
+    # Classification of the captured state/status/summary comparison.
+    # Choices: observation, inference, not-established
+    business_claim_classification: "observation"
+    # Does the pack establish the production p95 latency SLO?
+    # Choices: observation, inference, not-established
+    production_slo_claim: "observation"

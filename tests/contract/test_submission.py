@@ -28,40 +28,8 @@ ROOT = Path(__file__).parents[2]
 
 
 def valid_answers() -> dict[str, object]:
-    """Return a complete fictional answer sheet unrelated to Coldline outcomes."""
-    return {
-        "answers": {
-            "trace_diagnosis": (
-                "The fictional worker never extracted trace context from the fictional "
-                "queue message."
-            ),
-            "metric_diagnosis": (
-                "The fictional latency metric attached a unique fictional ID as a label."
-            ),
-            "trace_repair": (
-                "Injected the fictional trace context into the fictional message at "
-                "publish time and extracted it as the parent span at consume time."
-            ),
-            "metric_repair": (
-                "Removed the fictional unique-ID label from the fictional metric and "
-                "kept only a bounded fictional status label; also fixed the fictional "
-                "metric's unit."
-            ),
-            "before_trace_evidence": (
-                "Fictional worker span showed a new root Trace ID unrelated to the "
-                "fictional API trace."
-            ),
-            "after_trace_evidence": (
-                "Fictional worker span now appears as a child of the fictional API trace."
-            ),
-            "before_metric_evidence": (
-                "Fictional metric endpoint showed one time series per fictional request."
-            ),
-            "after_metric_evidence": (
-                "Fictional metric endpoint now shows one bounded time series per status value."
-            ),
-        }
-    }
+    """Use the fictional teaching sample for shape tests, never a real answer key."""
+    return _load_one_document(ROOT / "submission-sample.yaml")
 
 
 def test_complete_answer_shape_passes_public_validation(tmp_path: Path) -> None:
@@ -99,7 +67,7 @@ def test_unexpected_answer_field_is_rejected(tmp_path: Path) -> None:
     submission = tmp_path / "submission.yaml"
     submission.write_text(yaml.safe_dump(answers), encoding="utf-8")
 
-    with pytest.raises(SubmissionError, match="Additional properties"):
+    with pytest.raises(SubmissionError, match="additionalProperties"):
         validate_submission(submission, ROOT / "docs/contracts/submission.schema.json")
 
 
@@ -151,7 +119,7 @@ def test_public_entrypoint_reports_an_incomplete_answer_sheet(
     )
 
     assert main(tmp_path, changed_paths=[]) == 1
-    assert "answers.trace_diagnosis is incomplete" in capsys.readouterr().err
+    assert "answers.trace_diagnosis" in capsys.readouterr().err
 
 
 @pytest.mark.parametrize(

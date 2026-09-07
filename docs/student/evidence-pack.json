@@ -1,0 +1,2503 @@
+{
+  "pack_id": "sprint1-task13-repair-v1",
+  "provenance": {
+    "kind": "captured-local-runtime-and-source",
+    "captured_at": "2026-09-06T18:05:31.922668+00:00",
+    "runtime_checkpoint": "Task1.3 before and repaired after; only queue adapter, worker runtime and worker metrics replaced by the supplied next-checkpoint Task1.4 versions in a disposable checkout.",
+    "capture_environment": "Docker Compose, isolated tracing-assessment project, one worker, deterministic local provider configured at 250ms; synthetic readings only.",
+    "capture_method": [
+      "POST /api/v1/readings for separate in-range and out-of-range readings",
+      "Poll GET status_url until terminal",
+      "GET Jaeger /api/traces?service=coldline-api and coldline-worker; retain complete traces tagged with the accepted exception_id",
+      "docker compose exec -T worker python: Redis XRANGE coldline.exception.jobs filtered by exception_id",
+      "docker compose logs --no-color worker filtered by exception_id",
+      "Read worker http://localhost:9100/metrics inside worker container",
+      "GET Prometheus /api/v1/query using the supplied dashboard expression"
+    ],
+    "limits": [
+      "Runtime samples are observed local measurements, not latency/SLO/capacity guarantees.",
+      "Configured provider delay is not an observed measurement.",
+      "Record timestamps bound accepted-to-terminal persistence, not sensor-to-dispatcher latency.",
+      "No independent sensor clock, production workload, hosted model or managed-cloud evidence is supplied.",
+      "Snapshot source excerpts are source observations; inferred causality must be classified separately."
+    ],
+    "after_captured_at": "2026-09-06T18:09:58.690773+00:00",
+    "after_source_sha256_normalized_utf8": {
+      "src/adapters/queue/redis_streams.py": "2866e1946a08ce8374d25290b9e8e37c1565267fcdbf15e447c5cf444e955fd3",
+      "src/worker/runtime.py": "26367cd66db4f8c827cf39535257bb8440bb25ba67b4e4870cc5cbabdd367071",
+      "src/worker/metrics.py": "4afe9d898375c1e0964e067b902debad5e9121c0504e1b676f0f347550a9b4f9"
+    }
+  },
+  "before": {
+    "dashboard_query": {
+      "expression": "histogram_quantile(0.95, sum by (le) (rate(coldline_exception_processing_duration_seconds_bucket[5m]))) and on() (sum(rate(coldline_exception_processing_duration_seconds_bucket{le=\"5.0\"}[5m])) > 0)",
+      "response": {
+        "status": "success",
+        "data": {
+          "resultType": "vector",
+          "result": []
+        }
+      }
+    },
+    "captured_at": "2026-09-06T18:05:31.922668+00:00",
+    "phase": "before",
+    "normal": {
+      "request": {
+        "reading_id": "capture-9a67c77d44ac4ff5a1fa167fcb798d7c",
+        "shipment_id": "synthetic-capture",
+        "temperature_c": 5,
+        "allowed_min_c": 0,
+        "allowed_max_c": 10,
+        "recorded_at": "2026-09-06T18:05:09.390215+00:00"
+      },
+      "status_code": 422,
+      "body": {
+        "detail": "reading is within its accepted handling range"
+      }
+    },
+    "accepted": {
+      "request": {
+        "reading_id": "capture-2f999af59803469e8331a0e44fe454f4",
+        "shipment_id": "synthetic-capture",
+        "temperature_c": 20,
+        "allowed_min_c": 0,
+        "allowed_max_c": 10,
+        "recorded_at": "2026-09-06T18:05:11.544244+00:00"
+      },
+      "status_code": 202,
+      "body": {
+        "exception_id": "exc-15f7da9d-21ac-5c21-9004-28cf606298e2",
+        "state": "QUEUED",
+        "status_url": "/api/v1/exceptions/exc-15f7da9d-21ac-5c21-9004-28cf606298e2"
+      }
+    },
+    "persisted_record": {
+      "exception_id": "exc-15f7da9d-21ac-5c21-9004-28cf606298e2",
+      "reading": {
+        "reading_id": "capture-2f999af59803469e8331a0e44fe454f4",
+        "shipment_id": "synthetic-capture",
+        "temperature_c": 20.0,
+        "allowed_min_c": 0.0,
+        "allowed_max_c": 10.0,
+        "recorded_at": "2026-09-06T18:05:11.544244Z",
+        "context": ""
+      },
+      "state": "COMPLETED",
+      "accepted_at": "2026-09-06T18:05:13.589666Z",
+      "updated_at": "2026-09-06T18:05:13.866671Z",
+      "summary": "Synthetic shipment synthetic-capture exceeded the upper handling bound by 10.0 C; operational review is required.",
+      "failure_reason": null
+    },
+    "traces": {
+      "coldline-api": {
+        "data": [
+          {
+            "traceID": "ac8cd644a2374aef22d725aad63ea2f3",
+            "spans": [
+              {
+                "traceID": "ac8cd644a2374aef22d725aad63ea2f3",
+                "spanID": "b675df22df8f1b02",
+                "operationName": "POST /api/v1/readings http send",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "ac8cd644a2374aef22d725aad63ea2f3",
+                    "spanID": "9c3109e67a6573b8"
+                  }
+                ],
+                "startTime": 1788717913608350,
+                "duration": 54,
+                "tags": [
+                  {
+                    "key": "asgi.event.type",
+                    "type": "string",
+                    "value": "http.response.start"
+                  },
+                  {
+                    "key": "http.status_code",
+                    "type": "int64",
+                    "value": 202
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "opentelemetry.instrumentation.fastapi"
+                  },
+                  {
+                    "key": "otel.scope.version",
+                    "type": "string",
+                    "value": "0.65b0"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "ac8cd644a2374aef22d725aad63ea2f3",
+                "spanID": "27b765f06ad9c5d7",
+                "operationName": "POST /api/v1/readings http send",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "ac8cd644a2374aef22d725aad63ea2f3",
+                    "spanID": "9c3109e67a6573b8"
+                  }
+                ],
+                "startTime": 1788717913609168,
+                "duration": 27,
+                "tags": [
+                  {
+                    "key": "asgi.event.type",
+                    "type": "string",
+                    "value": "http.response.body"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "opentelemetry.instrumentation.fastapi"
+                  },
+                  {
+                    "key": "otel.scope.version",
+                    "type": "string",
+                    "value": "0.65b0"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "ac8cd644a2374aef22d725aad63ea2f3",
+                "spanID": "9c3109e67a6573b8",
+                "operationName": "POST /api/v1/readings",
+                "references": [],
+                "startTime": 1788717913586342,
+                "duration": 23321,
+                "tags": [
+                  {
+                    "key": "coldline.exception_id",
+                    "type": "string",
+                    "value": "exc-15f7da9d-21ac-5c21-9004-28cf606298e2"
+                  },
+                  {
+                    "key": "http.flavor",
+                    "type": "string",
+                    "value": "1.1"
+                  },
+                  {
+                    "key": "http.host",
+                    "type": "string",
+                    "value": "172.27.0.8:8000"
+                  },
+                  {
+                    "key": "http.method",
+                    "type": "string",
+                    "value": "POST"
+                  },
+                  {
+                    "key": "http.route",
+                    "type": "string",
+                    "value": "/api/v1/readings"
+                  },
+                  {
+                    "key": "http.scheme",
+                    "type": "string",
+                    "value": "http"
+                  },
+                  {
+                    "key": "http.server_name",
+                    "type": "string",
+                    "value": "localhost:18123"
+                  },
+                  {
+                    "key": "http.status_code",
+                    "type": "int64",
+                    "value": 202
+                  },
+                  {
+                    "key": "http.target",
+                    "type": "string",
+                    "value": "/api/v1/readings"
+                  },
+                  {
+                    "key": "http.url",
+                    "type": "string",
+                    "value": "http://localhost:18123/api/v1/readings"
+                  },
+                  {
+                    "key": "http.user_agent",
+                    "type": "string",
+                    "value": "Python-urllib/3.14"
+                  },
+                  {
+                    "key": "net.host.port",
+                    "type": "int64",
+                    "value": 8000
+                  },
+                  {
+                    "key": "net.peer.ip",
+                    "type": "string",
+                    "value": "172.27.0.1"
+                  },
+                  {
+                    "key": "net.peer.port",
+                    "type": "int64",
+                    "value": 53608
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "opentelemetry.instrumentation.fastapi"
+                  },
+                  {
+                    "key": "otel.scope.version",
+                    "type": "string",
+                    "value": "0.65b0"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "server"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "ac8cd644a2374aef22d725aad63ea2f3",
+                "spanID": "501513396818b83c",
+                "operationName": "POST /api/v1/readings http receive",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "ac8cd644a2374aef22d725aad63ea2f3",
+                    "spanID": "9c3109e67a6573b8"
+                  }
+                ],
+                "startTime": 1788717913586919,
+                "duration": 33,
+                "tags": [
+                  {
+                    "key": "asgi.event.type",
+                    "type": "string",
+                    "value": "http.request"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "opentelemetry.instrumentation.fastapi"
+                  },
+                  {
+                    "key": "otel.scope.version",
+                    "type": "string",
+                    "value": "0.65b0"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "ac8cd644a2374aef22d725aad63ea2f3",
+                "spanID": "65a2e4e471584c82",
+                "operationName": "POST /api/v1/readings http send",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "ac8cd644a2374aef22d725aad63ea2f3",
+                    "spanID": "9c3109e67a6573b8"
+                  }
+                ],
+                "startTime": 1788717913609455,
+                "duration": 63,
+                "tags": [
+                  {
+                    "key": "asgi.event.type",
+                    "type": "string",
+                    "value": "http.response.body"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "opentelemetry.instrumentation.fastapi"
+                  },
+                  {
+                    "key": "otel.scope.version",
+                    "type": "string",
+                    "value": "0.65b0"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "ac8cd644a2374aef22d725aad63ea2f3",
+                "spanID": "92c361e81b68b1a2",
+                "operationName": "postgres.exceptions.get",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "ac8cd644a2374aef22d725aad63ea2f3",
+                    "spanID": "9c3109e67a6573b8"
+                  }
+                ],
+                "startTime": 1788717913587846,
+                "duration": 1766,
+                "tags": [
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.persistence.postgres"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "ac8cd644a2374aef22d725aad63ea2f3",
+                "spanID": "59dd46986c4b5355",
+                "operationName": "postgres.exceptions.create",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "ac8cd644a2374aef22d725aad63ea2f3",
+                    "spanID": "9c3109e67a6573b8"
+                  }
+                ],
+                "startTime": 1788717913589897,
+                "duration": 11901,
+                "tags": [
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.persistence.postgres"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "ac8cd644a2374aef22d725aad63ea2f3",
+                "spanID": "1e429979ddc47c17",
+                "operationName": "postgres.exceptions.transition",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "ac8cd644a2374aef22d725aad63ea2f3",
+                    "spanID": "9c3109e67a6573b8"
+                  }
+                ],
+                "startTime": 1788717913602065,
+                "duration": 3530,
+                "tags": [
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.persistence.postgres"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "ac8cd644a2374aef22d725aad63ea2f3",
+                "spanID": "27362ad730d2ad6b",
+                "operationName": "job_queue.publish",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "ac8cd644a2374aef22d725aad63ea2f3",
+                    "spanID": "9c3109e67a6573b8"
+                  }
+                ],
+                "startTime": 1788717913605864,
+                "duration": 2081,
+                "tags": [
+                  {
+                    "key": "coldline.exception_id",
+                    "type": "string",
+                    "value": "exc-15f7da9d-21ac-5c21-9004-28cf606298e2"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.queue.redis_streams"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "ac8cd644a2374aef22d725aad63ea2f3",
+                "spanID": "b8ab183c11db82c6",
+                "operationName": "XADD",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "ac8cd644a2374aef22d725aad63ea2f3",
+                    "spanID": "27362ad730d2ad6b"
+                  }
+                ],
+                "startTime": 1788717913606088,
+                "duration": 1815,
+                "tags": [
+                  {
+                    "key": "db.redis.args_length",
+                    "type": "int64",
+                    "value": 5
+                  },
+                  {
+                    "key": "db.redis.database_index",
+                    "type": "int64",
+                    "value": 0
+                  },
+                  {
+                    "key": "db.statement",
+                    "type": "string",
+                    "value": "XADD ? ? ? ?"
+                  },
+                  {
+                    "key": "db.system",
+                    "type": "string",
+                    "value": "redis"
+                  },
+                  {
+                    "key": "net.peer.name",
+                    "type": "string",
+                    "value": "redis"
+                  },
+                  {
+                    "key": "net.peer.port",
+                    "type": "int64",
+                    "value": 6379
+                  },
+                  {
+                    "key": "net.transport",
+                    "type": "string",
+                    "value": "ip_tcp"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "opentelemetry.instrumentation.redis"
+                  },
+                  {
+                    "key": "otel.scope.version",
+                    "type": "string",
+                    "value": "0.65b0"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "client"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              }
+            ],
+            "processes": {
+              "p1": {
+                "serviceName": "coldline-api",
+                "tags": [
+                  {
+                    "key": "service.instance.id",
+                    "type": "string",
+                    "value": "52c432df-866f-4517-b3ab-139c19ba7403"
+                  },
+                  {
+                    "key": "telemetry.sdk.language",
+                    "type": "string",
+                    "value": "python"
+                  },
+                  {
+                    "key": "telemetry.sdk.name",
+                    "type": "string",
+                    "value": "opentelemetry"
+                  },
+                  {
+                    "key": "telemetry.sdk.version",
+                    "type": "string",
+                    "value": "1.44.0"
+                  }
+                ]
+              }
+            },
+            "warnings": null
+          }
+        ],
+        "total": 0,
+        "limit": 0,
+        "offset": 0,
+        "errors": null
+      },
+      "coldline-worker": {
+        "data": [
+          {
+            "traceID": "c47fd620eb1fd72ddfcd5e87679bb360",
+            "spans": [
+              {
+                "traceID": "c47fd620eb1fd72ddfcd5e87679bb360",
+                "spanID": "40d6142b82438ef3",
+                "operationName": "coldline.process_exception",
+                "references": [],
+                "startTime": 1788717913609743,
+                "duration": 265498,
+                "tags": [
+                  {
+                    "key": "coldline.delivery_count",
+                    "type": "int64",
+                    "value": 1
+                  },
+                  {
+                    "key": "coldline.exception_id",
+                    "type": "string",
+                    "value": "exc-15f7da9d-21ac-5c21-9004-28cf606298e2"
+                  },
+                  {
+                    "key": "coldline.message_id",
+                    "type": "string",
+                    "value": "1788717913606-0"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "__main__"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "c47fd620eb1fd72ddfcd5e87679bb360",
+                "spanID": "e19f584b6035eab8",
+                "operationName": "postgres.exceptions.get",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "c47fd620eb1fd72ddfcd5e87679bb360",
+                    "spanID": "40d6142b82438ef3"
+                  }
+                ],
+                "startTime": 1788717913609813,
+                "duration": 2028,
+                "tags": [
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.persistence.postgres"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "c47fd620eb1fd72ddfcd5e87679bb360",
+                "spanID": "0e5c32252e106ab3",
+                "operationName": "postgres.exceptions.transition",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "c47fd620eb1fd72ddfcd5e87679bb360",
+                    "spanID": "40d6142b82438ef3"
+                  }
+                ],
+                "startTime": 1788717913612055,
+                "duration": 3511,
+                "tags": [
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.persistence.postgres"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "c47fd620eb1fd72ddfcd5e87679bb360",
+                "spanID": "71bb30a167f49cd6",
+                "operationName": "model_provider.summarize",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "c47fd620eb1fd72ddfcd5e87679bb360",
+                    "spanID": "40d6142b82438ef3"
+                  }
+                ],
+                "startTime": 1788717913615835,
+                "duration": 250371,
+                "tags": [
+                  {
+                    "key": "coldline.exception_id",
+                    "type": "string",
+                    "value": "exc-15f7da9d-21ac-5c21-9004-28cf606298e2"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.model.deterministic"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "c47fd620eb1fd72ddfcd5e87679bb360",
+                "spanID": "e28b49b87ac04c89",
+                "operationName": "postgres.exceptions.transition",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "c47fd620eb1fd72ddfcd5e87679bb360",
+                    "spanID": "40d6142b82438ef3"
+                  }
+                ],
+                "startTime": 1788717913866337,
+                "duration": 7387,
+                "tags": [
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.persistence.postgres"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "c47fd620eb1fd72ddfcd5e87679bb360",
+                "spanID": "366906a16083651c",
+                "operationName": "XACK",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "c47fd620eb1fd72ddfcd5e87679bb360",
+                    "spanID": "40d6142b82438ef3"
+                  }
+                ],
+                "startTime": 1788717913873925,
+                "duration": 1021,
+                "tags": [
+                  {
+                    "key": "db.redis.args_length",
+                    "type": "int64",
+                    "value": 4
+                  },
+                  {
+                    "key": "db.redis.database_index",
+                    "type": "int64",
+                    "value": 0
+                  },
+                  {
+                    "key": "db.statement",
+                    "type": "string",
+                    "value": "XACK ? ? ?"
+                  },
+                  {
+                    "key": "db.system",
+                    "type": "string",
+                    "value": "redis"
+                  },
+                  {
+                    "key": "net.peer.name",
+                    "type": "string",
+                    "value": "redis"
+                  },
+                  {
+                    "key": "net.peer.port",
+                    "type": "int64",
+                    "value": 6379
+                  },
+                  {
+                    "key": "net.transport",
+                    "type": "string",
+                    "value": "ip_tcp"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "opentelemetry.instrumentation.redis"
+                  },
+                  {
+                    "key": "otel.scope.version",
+                    "type": "string",
+                    "value": "0.65b0"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "client"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              }
+            ],
+            "processes": {
+              "p1": {
+                "serviceName": "coldline-worker",
+                "tags": [
+                  {
+                    "key": "service.instance.id",
+                    "type": "string",
+                    "value": "c08f5cbb-d8c5-42a1-b2fd-f9de9b99916b"
+                  },
+                  {
+                    "key": "telemetry.sdk.language",
+                    "type": "string",
+                    "value": "python"
+                  },
+                  {
+                    "key": "telemetry.sdk.name",
+                    "type": "string",
+                    "value": "opentelemetry"
+                  },
+                  {
+                    "key": "telemetry.sdk.version",
+                    "type": "string",
+                    "value": "1.44.0"
+                  }
+                ]
+              }
+            },
+            "warnings": null
+          }
+        ],
+        "total": 0,
+        "limit": 0,
+        "offset": 0,
+        "errors": null
+      }
+    },
+    "redis_entries": [
+      [
+        "1788717913606-0",
+        {
+          "job": "{\"exception_id\":\"exc-15f7da9d-21ac-5c21-9004-28cf606298e2\",\"reading\":{\"reading_id\":\"capture-2f999af59803469e8331a0e44fe454f4\",\"shipment_id\":\"synthetic-capture\",\"temperature_c\":20.0,\"allowed_min_c\":0.0,\"allowed_max_c\":10.0,\"recorded_at\":\"2026-09-06T18:05:11.544244Z\",\"context\":\"\"},\"accepted_at\":\"2026-09-06T18:05:13.589666Z\"}"
+        }
+      ]
+    ],
+    "worker_log": "worker-1  | {\"level\": \"INFO\", \"message\": \"processed exception_id=exc-15f7da9d-21ac-5c21-9004-28cf606298e2 disposition=ACK\", \"service\": \"coldline-worker\", \"span_id\": \"40d6142b82438ef3\", \"timestamp\": \"2026-09-06T18:05:13.875093+00:00\", \"trace_id\": \"c47fd620eb1fd72ddfcd5e87679bb360\"}",
+    "worker_metrics": "coldline_exception_processing_duration_seconds_bucket{le=\"0.05\",request_id=\"exc-f81df166-e592-5b0e-be86-5119f721d770\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"0.1\",request_id=\"exc-f81df166-e592-5b0e-be86-5119f721d770\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"0.25\",request_id=\"exc-f81df166-e592-5b0e-be86-5119f721d770\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"0.5\",request_id=\"exc-f81df166-e592-5b0e-be86-5119f721d770\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"1.0\",request_id=\"exc-f81df166-e592-5b0e-be86-5119f721d770\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"2.5\",request_id=\"exc-f81df166-e592-5b0e-be86-5119f721d770\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"5.0\",request_id=\"exc-f81df166-e592-5b0e-be86-5119f721d770\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"+Inf\",request_id=\"exc-f81df166-e592-5b0e-be86-5119f721d770\"} 1.0\ncoldline_exception_processing_duration_seconds_count{request_id=\"exc-f81df166-e592-5b0e-be86-5119f721d770\"} 1.0\ncoldline_exception_processing_duration_seconds_sum{request_id=\"exc-f81df166-e592-5b0e-be86-5119f721d770\"} 309.287\ncoldline_exception_processing_duration_seconds_bucket{le=\"0.05\",request_id=\"exc-6468838f-bf4b-50c5-ad48-7e1a947c6e6c\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"0.1\",request_id=\"exc-6468838f-bf4b-50c5-ad48-7e1a947c6e6c\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"0.25\",request_id=\"exc-6468838f-bf4b-50c5-ad48-7e1a947c6e6c\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"0.5\",request_id=\"exc-6468838f-bf4b-50c5-ad48-7e1a947c6e6c\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"1.0\",request_id=\"exc-6468838f-bf4b-50c5-ad48-7e1a947c6e6c\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"2.5\",request_id=\"exc-6468838f-bf4b-50c5-ad48-7e1a947c6e6c\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"5.0\",request_id=\"exc-6468838f-bf4b-50c5-ad48-7e1a947c6e6c\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"+Inf\",request_id=\"exc-6468838f-bf4b-50c5-ad48-7e1a947c6e6c\"} 1.0\ncoldline_exception_processing_duration_seconds_count{request_id=\"exc-6468838f-bf4b-50c5-ad48-7e1a947c6e6c\"} 1.0\ncoldline_exception_processing_duration_seconds_sum{request_id=\"exc-6468838f-bf4b-50c5-ad48-7e1a947c6e6c\"} 283.675\ncoldline_exception_processing_duration_seconds_bucket{le=\"0.05\",request_id=\"exc-15f7da9d-21ac-5c21-9004-28cf606298e2\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"0.1\",request_id=\"exc-15f7da9d-21ac-5c21-9004-28cf606298e2\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"0.25\",request_id=\"exc-15f7da9d-21ac-5c21-9004-28cf606298e2\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"0.5\",request_id=\"exc-15f7da9d-21ac-5c21-9004-28cf606298e2\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"1.0\",request_id=\"exc-15f7da9d-21ac-5c21-9004-28cf606298e2\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"2.5\",request_id=\"exc-15f7da9d-21ac-5c21-9004-28cf606298e2\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"5.0\",request_id=\"exc-15f7da9d-21ac-5c21-9004-28cf606298e2\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"+Inf\",request_id=\"exc-15f7da9d-21ac-5c21-9004-28cf606298e2\"} 1.0\ncoldline_exception_processing_duration_seconds_count{request_id=\"exc-15f7da9d-21ac-5c21-9004-28cf606298e2\"} 1.0\ncoldline_exception_processing_duration_seconds_sum{request_id=\"exc-15f7da9d-21ac-5c21-9004-28cf606298e2\"} 285.314\ncoldline_exception_processing_duration_seconds_created{request_id=\"exc-f81df166-e592-5b0e-be86-5119f721d770\"} 1.7887177738442743e+09\ncoldline_exception_processing_duration_seconds_created{request_id=\"exc-6468838f-bf4b-50c5-ad48-7e1a947c6e6c\"} 1.788717881505001e+09\ncoldline_exception_processing_duration_seconds_created{request_id=\"exc-15f7da9d-21ac-5c21-9004-28cf606298e2\"} 1.7887179138750408e+09"
+  },
+  "after": {
+    "dashboard_query": {
+      "expression": "histogram_quantile(0.95, sum by (le) (rate(coldline_exception_processing_duration_seconds_bucket[5m]))) and on() (sum(rate(coldline_exception_processing_duration_seconds_bucket{le=\"5.0\"}[5m])) > 0)",
+      "response": {
+        "status": "success",
+        "data": {
+          "resultType": "vector",
+          "result": [
+            {
+              "metric": {},
+              "value": [
+                1788718198.677,
+                "0.4875"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "captured_at": "2026-09-06T18:09:58.690773+00:00",
+    "phase": "after",
+    "normal": {
+      "request": {
+        "reading_id": "capture-e501de63c2a34276940f8f8fbaa1ef76",
+        "shipment_id": "synthetic-capture",
+        "temperature_c": 5,
+        "allowed_min_c": 0,
+        "allowed_max_c": 10,
+        "recorded_at": "2026-09-06T18:09:31.492654+00:00"
+      },
+      "status_code": 422,
+      "body": {
+        "detail": "reading is within its accepted handling range"
+      }
+    },
+    "accepted": {
+      "request": {
+        "reading_id": "capture-8eed6eff8f45497bb71abc759d5c0afc",
+        "shipment_id": "synthetic-capture",
+        "temperature_c": 20,
+        "allowed_min_c": 0,
+        "allowed_max_c": 10,
+        "recorded_at": "2026-09-06T18:09:33.654949+00:00"
+      },
+      "status_code": 202,
+      "body": {
+        "exception_id": "exc-5524750b-8979-53ae-bcac-49d03f2ae859",
+        "state": "QUEUED",
+        "status_url": "/api/v1/exceptions/exc-5524750b-8979-53ae-bcac-49d03f2ae859"
+      }
+    },
+    "persisted_record": {
+      "exception_id": "exc-5524750b-8979-53ae-bcac-49d03f2ae859",
+      "reading": {
+        "reading_id": "capture-8eed6eff8f45497bb71abc759d5c0afc",
+        "shipment_id": "synthetic-capture",
+        "temperature_c": 20.0,
+        "allowed_min_c": 0.0,
+        "allowed_max_c": 10.0,
+        "recorded_at": "2026-09-06T18:09:33.654949Z",
+        "context": ""
+      },
+      "state": "COMPLETED",
+      "accepted_at": "2026-09-06T18:09:35.724866Z",
+      "updated_at": "2026-09-06T18:09:36.052696Z",
+      "summary": "Synthetic shipment synthetic-capture exceeded the upper handling bound by 10.0 C; operational review is required.",
+      "failure_reason": null
+    },
+    "traces": {
+      "coldline-api": {
+        "data": [
+          {
+            "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+            "spans": [
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "f61c2c7c9e515001",
+                "operationName": "POST /api/v1/readings http send",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "469e234a45f04db2"
+                  }
+                ],
+                "startTime": 1788718175757355,
+                "duration": 87,
+                "tags": [
+                  {
+                    "key": "asgi.event.type",
+                    "type": "string",
+                    "value": "http.response.start"
+                  },
+                  {
+                    "key": "http.status_code",
+                    "type": "int64",
+                    "value": 202
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "opentelemetry.instrumentation.fastapi"
+                  },
+                  {
+                    "key": "otel.scope.version",
+                    "type": "string",
+                    "value": "0.65b0"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "4b9adc0bcc7d8e78",
+                "operationName": "postgres.exceptions.transition",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "469e234a45f04db2"
+                  }
+                ],
+                "startTime": 1788718175736482,
+                "duration": 14030,
+                "tags": [
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.persistence.postgres"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "ac7be2f58f849ce0",
+                "operationName": "postgres.exceptions.get",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "35672640b8c9943a"
+                  }
+                ],
+                "startTime": 1788718175763298,
+                "duration": 10836,
+                "tags": [
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.persistence.postgres"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p2",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "444bf3b380526f38",
+                "operationName": "postgres.exceptions.transition",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "35672640b8c9943a"
+                  }
+                ],
+                "startTime": 1788718176052216,
+                "duration": 10887,
+                "tags": [
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.persistence.postgres"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p2",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "de05906bc1d28e36",
+                "operationName": "POST /api/v1/readings http receive",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "469e234a45f04db2"
+                  }
+                ],
+                "startTime": 1788718175708294,
+                "duration": 68,
+                "tags": [
+                  {
+                    "key": "asgi.event.type",
+                    "type": "string",
+                    "value": "http.request"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "opentelemetry.instrumentation.fastapi"
+                  },
+                  {
+                    "key": "otel.scope.version",
+                    "type": "string",
+                    "value": "0.65b0"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "05e39f10e761fa31",
+                "operationName": "postgres.exceptions.create",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "469e234a45f04db2"
+                  }
+                ],
+                "startTime": 1788718175725520,
+                "duration": 10123,
+                "tags": [
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.persistence.postgres"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "3d01ba6719781d6c",
+                "operationName": "job_queue.publish",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "469e234a45f04db2"
+                  }
+                ],
+                "startTime": 1788718175751289,
+                "duration": 5004,
+                "tags": [
+                  {
+                    "key": "coldline.exception_id",
+                    "type": "string",
+                    "value": "exc-5524750b-8979-53ae-bcac-49d03f2ae859"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.queue.redis_streams"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "c4bd510832100aaa",
+                "operationName": "XADD",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "3d01ba6719781d6c"
+                  }
+                ],
+                "startTime": 1788718175752603,
+                "duration": 3614,
+                "tags": [
+                  {
+                    "key": "db.redis.args_length",
+                    "type": "int64",
+                    "value": 7
+                  },
+                  {
+                    "key": "db.redis.database_index",
+                    "type": "int64",
+                    "value": 0
+                  },
+                  {
+                    "key": "db.statement",
+                    "type": "string",
+                    "value": "XADD ? ? ? ? ? ?"
+                  },
+                  {
+                    "key": "db.system",
+                    "type": "string",
+                    "value": "redis"
+                  },
+                  {
+                    "key": "net.peer.name",
+                    "type": "string",
+                    "value": "redis"
+                  },
+                  {
+                    "key": "net.peer.port",
+                    "type": "int64",
+                    "value": 6379
+                  },
+                  {
+                    "key": "net.transport",
+                    "type": "string",
+                    "value": "ip_tcp"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "opentelemetry.instrumentation.redis"
+                  },
+                  {
+                    "key": "otel.scope.version",
+                    "type": "string",
+                    "value": "0.65b0"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "client"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "afcb878992cbf28e",
+                "operationName": "POST /api/v1/readings http send",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "469e234a45f04db2"
+                  }
+                ],
+                "startTime": 1788718175759112,
+                "duration": 53,
+                "tags": [
+                  {
+                    "key": "asgi.event.type",
+                    "type": "string",
+                    "value": "http.response.body"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "opentelemetry.instrumentation.fastapi"
+                  },
+                  {
+                    "key": "otel.scope.version",
+                    "type": "string",
+                    "value": "0.65b0"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "344831ccaab5882e",
+                "operationName": "POST /api/v1/readings http send",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "469e234a45f04db2"
+                  }
+                ],
+                "startTime": 1788718175759667,
+                "duration": 48,
+                "tags": [
+                  {
+                    "key": "asgi.event.type",
+                    "type": "string",
+                    "value": "http.response.body"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "opentelemetry.instrumentation.fastapi"
+                  },
+                  {
+                    "key": "otel.scope.version",
+                    "type": "string",
+                    "value": "0.65b0"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "35672640b8c9943a",
+                "operationName": "coldline.process_exception",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "3d01ba6719781d6c"
+                  }
+                ],
+                "startTime": 1788718175760010,
+                "duration": 309315,
+                "tags": [
+                  {
+                    "key": "coldline.delivery_count",
+                    "type": "int64",
+                    "value": 1
+                  },
+                  {
+                    "key": "coldline.exception_id",
+                    "type": "string",
+                    "value": "exc-5524750b-8979-53ae-bcac-49d03f2ae859"
+                  },
+                  {
+                    "key": "coldline.message_id",
+                    "type": "string",
+                    "value": "1788718175753-0"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "__main__"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p2",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "3b018490d806bd7c",
+                "operationName": "model_provider.summarize",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "35672640b8c9943a"
+                  }
+                ],
+                "startTime": 1788718175785600,
+                "duration": 266388,
+                "tags": [
+                  {
+                    "key": "coldline.exception_id",
+                    "type": "string",
+                    "value": "exc-5524750b-8979-53ae-bcac-49d03f2ae859"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.model.deterministic"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p2",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "469e234a45f04db2",
+                "operationName": "POST /api/v1/readings",
+                "references": [],
+                "startTime": 1788718175706709,
+                "duration": 53268,
+                "tags": [
+                  {
+                    "key": "coldline.exception_id",
+                    "type": "string",
+                    "value": "exc-5524750b-8979-53ae-bcac-49d03f2ae859"
+                  },
+                  {
+                    "key": "http.flavor",
+                    "type": "string",
+                    "value": "1.1"
+                  },
+                  {
+                    "key": "http.host",
+                    "type": "string",
+                    "value": "172.27.0.8:8000"
+                  },
+                  {
+                    "key": "http.method",
+                    "type": "string",
+                    "value": "POST"
+                  },
+                  {
+                    "key": "http.route",
+                    "type": "string",
+                    "value": "/api/v1/readings"
+                  },
+                  {
+                    "key": "http.scheme",
+                    "type": "string",
+                    "value": "http"
+                  },
+                  {
+                    "key": "http.server_name",
+                    "type": "string",
+                    "value": "localhost:18123"
+                  },
+                  {
+                    "key": "http.status_code",
+                    "type": "int64",
+                    "value": 202
+                  },
+                  {
+                    "key": "http.target",
+                    "type": "string",
+                    "value": "/api/v1/readings"
+                  },
+                  {
+                    "key": "http.url",
+                    "type": "string",
+                    "value": "http://localhost:18123/api/v1/readings"
+                  },
+                  {
+                    "key": "http.user_agent",
+                    "type": "string",
+                    "value": "Python-urllib/3.14"
+                  },
+                  {
+                    "key": "net.host.port",
+                    "type": "int64",
+                    "value": 8000
+                  },
+                  {
+                    "key": "net.peer.ip",
+                    "type": "string",
+                    "value": "172.27.0.1"
+                  },
+                  {
+                    "key": "net.peer.port",
+                    "type": "int64",
+                    "value": 52282
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "opentelemetry.instrumentation.fastapi"
+                  },
+                  {
+                    "key": "otel.scope.version",
+                    "type": "string",
+                    "value": "0.65b0"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "server"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "e26e2ce3ef007983",
+                "operationName": "postgres.exceptions.get",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "469e234a45f04db2"
+                  }
+                ],
+                "startTime": 1788718175712031,
+                "duration": 12681,
+                "tags": [
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.persistence.postgres"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "a0bbdfaf216f04f9",
+                "operationName": "postgres.exceptions.transition",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "35672640b8c9943a"
+                  }
+                ],
+                "startTime": 1788718175774704,
+                "duration": 9389,
+                "tags": [
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.persistence.postgres"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p2",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "164e42c7f22c8a1d",
+                "operationName": "XACK",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "35672640b8c9943a"
+                  }
+                ],
+                "startTime": 1788718176063969,
+                "duration": 3454,
+                "tags": [
+                  {
+                    "key": "db.redis.args_length",
+                    "type": "int64",
+                    "value": 4
+                  },
+                  {
+                    "key": "db.redis.database_index",
+                    "type": "int64",
+                    "value": 0
+                  },
+                  {
+                    "key": "db.statement",
+                    "type": "string",
+                    "value": "XACK ? ? ?"
+                  },
+                  {
+                    "key": "db.system",
+                    "type": "string",
+                    "value": "redis"
+                  },
+                  {
+                    "key": "net.peer.name",
+                    "type": "string",
+                    "value": "redis"
+                  },
+                  {
+                    "key": "net.peer.port",
+                    "type": "int64",
+                    "value": 6379
+                  },
+                  {
+                    "key": "net.transport",
+                    "type": "string",
+                    "value": "ip_tcp"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "opentelemetry.instrumentation.redis"
+                  },
+                  {
+                    "key": "otel.scope.version",
+                    "type": "string",
+                    "value": "0.65b0"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "client"
+                  }
+                ],
+                "logs": [],
+                "processID": "p2",
+                "warnings": null
+              }
+            ],
+            "processes": {
+              "p1": {
+                "serviceName": "coldline-api",
+                "tags": [
+                  {
+                    "key": "service.instance.id",
+                    "type": "string",
+                    "value": "a48933c0-f987-44e3-a2ee-acb7600ecc10"
+                  },
+                  {
+                    "key": "telemetry.sdk.language",
+                    "type": "string",
+                    "value": "python"
+                  },
+                  {
+                    "key": "telemetry.sdk.name",
+                    "type": "string",
+                    "value": "opentelemetry"
+                  },
+                  {
+                    "key": "telemetry.sdk.version",
+                    "type": "string",
+                    "value": "1.44.0"
+                  }
+                ]
+              },
+              "p2": {
+                "serviceName": "coldline-worker",
+                "tags": [
+                  {
+                    "key": "service.instance.id",
+                    "type": "string",
+                    "value": "7530ece6-fb05-4f64-a6cc-26656fc7533f"
+                  },
+                  {
+                    "key": "telemetry.sdk.language",
+                    "type": "string",
+                    "value": "python"
+                  },
+                  {
+                    "key": "telemetry.sdk.name",
+                    "type": "string",
+                    "value": "opentelemetry"
+                  },
+                  {
+                    "key": "telemetry.sdk.version",
+                    "type": "string",
+                    "value": "1.44.0"
+                  }
+                ]
+              }
+            },
+            "warnings": null
+          }
+        ],
+        "total": 0,
+        "limit": 0,
+        "offset": 0,
+        "errors": null
+      },
+      "coldline-worker": {
+        "data": [
+          {
+            "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+            "spans": [
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "e26e2ce3ef007983",
+                "operationName": "postgres.exceptions.get",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "469e234a45f04db2"
+                  }
+                ],
+                "startTime": 1788718175712031,
+                "duration": 12681,
+                "tags": [
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.persistence.postgres"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "c4bd510832100aaa",
+                "operationName": "XADD",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "3d01ba6719781d6c"
+                  }
+                ],
+                "startTime": 1788718175752603,
+                "duration": 3614,
+                "tags": [
+                  {
+                    "key": "db.redis.args_length",
+                    "type": "int64",
+                    "value": 7
+                  },
+                  {
+                    "key": "db.redis.database_index",
+                    "type": "int64",
+                    "value": 0
+                  },
+                  {
+                    "key": "db.statement",
+                    "type": "string",
+                    "value": "XADD ? ? ? ? ? ?"
+                  },
+                  {
+                    "key": "db.system",
+                    "type": "string",
+                    "value": "redis"
+                  },
+                  {
+                    "key": "net.peer.name",
+                    "type": "string",
+                    "value": "redis"
+                  },
+                  {
+                    "key": "net.peer.port",
+                    "type": "int64",
+                    "value": 6379
+                  },
+                  {
+                    "key": "net.transport",
+                    "type": "string",
+                    "value": "ip_tcp"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "opentelemetry.instrumentation.redis"
+                  },
+                  {
+                    "key": "otel.scope.version",
+                    "type": "string",
+                    "value": "0.65b0"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "client"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "afcb878992cbf28e",
+                "operationName": "POST /api/v1/readings http send",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "469e234a45f04db2"
+                  }
+                ],
+                "startTime": 1788718175759112,
+                "duration": 53,
+                "tags": [
+                  {
+                    "key": "asgi.event.type",
+                    "type": "string",
+                    "value": "http.response.body"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "opentelemetry.instrumentation.fastapi"
+                  },
+                  {
+                    "key": "otel.scope.version",
+                    "type": "string",
+                    "value": "0.65b0"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "35672640b8c9943a",
+                "operationName": "coldline.process_exception",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "3d01ba6719781d6c"
+                  }
+                ],
+                "startTime": 1788718175760010,
+                "duration": 309315,
+                "tags": [
+                  {
+                    "key": "coldline.delivery_count",
+                    "type": "int64",
+                    "value": 1
+                  },
+                  {
+                    "key": "coldline.exception_id",
+                    "type": "string",
+                    "value": "exc-5524750b-8979-53ae-bcac-49d03f2ae859"
+                  },
+                  {
+                    "key": "coldline.message_id",
+                    "type": "string",
+                    "value": "1788718175753-0"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "__main__"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p2",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "444bf3b380526f38",
+                "operationName": "postgres.exceptions.transition",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "35672640b8c9943a"
+                  }
+                ],
+                "startTime": 1788718176052216,
+                "duration": 10887,
+                "tags": [
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.persistence.postgres"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p2",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "469e234a45f04db2",
+                "operationName": "POST /api/v1/readings",
+                "references": [],
+                "startTime": 1788718175706709,
+                "duration": 53268,
+                "tags": [
+                  {
+                    "key": "coldline.exception_id",
+                    "type": "string",
+                    "value": "exc-5524750b-8979-53ae-bcac-49d03f2ae859"
+                  },
+                  {
+                    "key": "http.flavor",
+                    "type": "string",
+                    "value": "1.1"
+                  },
+                  {
+                    "key": "http.host",
+                    "type": "string",
+                    "value": "172.27.0.8:8000"
+                  },
+                  {
+                    "key": "http.method",
+                    "type": "string",
+                    "value": "POST"
+                  },
+                  {
+                    "key": "http.route",
+                    "type": "string",
+                    "value": "/api/v1/readings"
+                  },
+                  {
+                    "key": "http.scheme",
+                    "type": "string",
+                    "value": "http"
+                  },
+                  {
+                    "key": "http.server_name",
+                    "type": "string",
+                    "value": "localhost:18123"
+                  },
+                  {
+                    "key": "http.status_code",
+                    "type": "int64",
+                    "value": 202
+                  },
+                  {
+                    "key": "http.target",
+                    "type": "string",
+                    "value": "/api/v1/readings"
+                  },
+                  {
+                    "key": "http.url",
+                    "type": "string",
+                    "value": "http://localhost:18123/api/v1/readings"
+                  },
+                  {
+                    "key": "http.user_agent",
+                    "type": "string",
+                    "value": "Python-urllib/3.14"
+                  },
+                  {
+                    "key": "net.host.port",
+                    "type": "int64",
+                    "value": 8000
+                  },
+                  {
+                    "key": "net.peer.ip",
+                    "type": "string",
+                    "value": "172.27.0.1"
+                  },
+                  {
+                    "key": "net.peer.port",
+                    "type": "int64",
+                    "value": 52282
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "opentelemetry.instrumentation.fastapi"
+                  },
+                  {
+                    "key": "otel.scope.version",
+                    "type": "string",
+                    "value": "0.65b0"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "server"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "de05906bc1d28e36",
+                "operationName": "POST /api/v1/readings http receive",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "469e234a45f04db2"
+                  }
+                ],
+                "startTime": 1788718175708294,
+                "duration": 68,
+                "tags": [
+                  {
+                    "key": "asgi.event.type",
+                    "type": "string",
+                    "value": "http.request"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "opentelemetry.instrumentation.fastapi"
+                  },
+                  {
+                    "key": "otel.scope.version",
+                    "type": "string",
+                    "value": "0.65b0"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "05e39f10e761fa31",
+                "operationName": "postgres.exceptions.create",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "469e234a45f04db2"
+                  }
+                ],
+                "startTime": 1788718175725520,
+                "duration": 10123,
+                "tags": [
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.persistence.postgres"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "3d01ba6719781d6c",
+                "operationName": "job_queue.publish",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "469e234a45f04db2"
+                  }
+                ],
+                "startTime": 1788718175751289,
+                "duration": 5004,
+                "tags": [
+                  {
+                    "key": "coldline.exception_id",
+                    "type": "string",
+                    "value": "exc-5524750b-8979-53ae-bcac-49d03f2ae859"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.queue.redis_streams"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "344831ccaab5882e",
+                "operationName": "POST /api/v1/readings http send",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "469e234a45f04db2"
+                  }
+                ],
+                "startTime": 1788718175759667,
+                "duration": 48,
+                "tags": [
+                  {
+                    "key": "asgi.event.type",
+                    "type": "string",
+                    "value": "http.response.body"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "opentelemetry.instrumentation.fastapi"
+                  },
+                  {
+                    "key": "otel.scope.version",
+                    "type": "string",
+                    "value": "0.65b0"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "a0bbdfaf216f04f9",
+                "operationName": "postgres.exceptions.transition",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "35672640b8c9943a"
+                  }
+                ],
+                "startTime": 1788718175774704,
+                "duration": 9389,
+                "tags": [
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.persistence.postgres"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p2",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "3b018490d806bd7c",
+                "operationName": "model_provider.summarize",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "35672640b8c9943a"
+                  }
+                ],
+                "startTime": 1788718175785600,
+                "duration": 266388,
+                "tags": [
+                  {
+                    "key": "coldline.exception_id",
+                    "type": "string",
+                    "value": "exc-5524750b-8979-53ae-bcac-49d03f2ae859"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.model.deterministic"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p2",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "4b9adc0bcc7d8e78",
+                "operationName": "postgres.exceptions.transition",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "469e234a45f04db2"
+                  }
+                ],
+                "startTime": 1788718175736482,
+                "duration": 14030,
+                "tags": [
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.persistence.postgres"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "f61c2c7c9e515001",
+                "operationName": "POST /api/v1/readings http send",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "469e234a45f04db2"
+                  }
+                ],
+                "startTime": 1788718175757355,
+                "duration": 87,
+                "tags": [
+                  {
+                    "key": "asgi.event.type",
+                    "type": "string",
+                    "value": "http.response.start"
+                  },
+                  {
+                    "key": "http.status_code",
+                    "type": "int64",
+                    "value": 202
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "opentelemetry.instrumentation.fastapi"
+                  },
+                  {
+                    "key": "otel.scope.version",
+                    "type": "string",
+                    "value": "0.65b0"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p1",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "ac7be2f58f849ce0",
+                "operationName": "postgres.exceptions.get",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "35672640b8c9943a"
+                  }
+                ],
+                "startTime": 1788718175763298,
+                "duration": 10836,
+                "tags": [
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "adapters.persistence.postgres"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "internal"
+                  }
+                ],
+                "logs": [],
+                "processID": "p2",
+                "warnings": null
+              },
+              {
+                "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                "spanID": "164e42c7f22c8a1d",
+                "operationName": "XACK",
+                "references": [
+                  {
+                    "refType": "CHILD_OF",
+                    "traceID": "70cca26523f82ebbbcf086d8ffabbe03",
+                    "spanID": "35672640b8c9943a"
+                  }
+                ],
+                "startTime": 1788718176063969,
+                "duration": 3454,
+                "tags": [
+                  {
+                    "key": "db.redis.args_length",
+                    "type": "int64",
+                    "value": 4
+                  },
+                  {
+                    "key": "db.redis.database_index",
+                    "type": "int64",
+                    "value": 0
+                  },
+                  {
+                    "key": "db.statement",
+                    "type": "string",
+                    "value": "XACK ? ? ?"
+                  },
+                  {
+                    "key": "db.system",
+                    "type": "string",
+                    "value": "redis"
+                  },
+                  {
+                    "key": "net.peer.name",
+                    "type": "string",
+                    "value": "redis"
+                  },
+                  {
+                    "key": "net.peer.port",
+                    "type": "int64",
+                    "value": 6379
+                  },
+                  {
+                    "key": "net.transport",
+                    "type": "string",
+                    "value": "ip_tcp"
+                  },
+                  {
+                    "key": "otel.scope.name",
+                    "type": "string",
+                    "value": "opentelemetry.instrumentation.redis"
+                  },
+                  {
+                    "key": "otel.scope.version",
+                    "type": "string",
+                    "value": "0.65b0"
+                  },
+                  {
+                    "key": "span.kind",
+                    "type": "string",
+                    "value": "client"
+                  }
+                ],
+                "logs": [],
+                "processID": "p2",
+                "warnings": null
+              }
+            ],
+            "processes": {
+              "p1": {
+                "serviceName": "coldline-api",
+                "tags": [
+                  {
+                    "key": "service.instance.id",
+                    "type": "string",
+                    "value": "a48933c0-f987-44e3-a2ee-acb7600ecc10"
+                  },
+                  {
+                    "key": "telemetry.sdk.language",
+                    "type": "string",
+                    "value": "python"
+                  },
+                  {
+                    "key": "telemetry.sdk.name",
+                    "type": "string",
+                    "value": "opentelemetry"
+                  },
+                  {
+                    "key": "telemetry.sdk.version",
+                    "type": "string",
+                    "value": "1.44.0"
+                  }
+                ]
+              },
+              "p2": {
+                "serviceName": "coldline-worker",
+                "tags": [
+                  {
+                    "key": "service.instance.id",
+                    "type": "string",
+                    "value": "7530ece6-fb05-4f64-a6cc-26656fc7533f"
+                  },
+                  {
+                    "key": "telemetry.sdk.language",
+                    "type": "string",
+                    "value": "python"
+                  },
+                  {
+                    "key": "telemetry.sdk.name",
+                    "type": "string",
+                    "value": "opentelemetry"
+                  },
+                  {
+                    "key": "telemetry.sdk.version",
+                    "type": "string",
+                    "value": "1.44.0"
+                  }
+                ]
+              }
+            },
+            "warnings": null
+          }
+        ],
+        "total": 0,
+        "limit": 0,
+        "offset": 0,
+        "errors": null
+      }
+    },
+    "redis_entries": [
+      [
+        "1788718175753-0",
+        {
+          "job": "{\"exception_id\":\"exc-5524750b-8979-53ae-bcac-49d03f2ae859\",\"reading\":{\"reading_id\":\"capture-8eed6eff8f45497bb71abc759d5c0afc\",\"shipment_id\":\"synthetic-capture\",\"temperature_c\":20.0,\"allowed_min_c\":0.0,\"allowed_max_c\":10.0,\"recorded_at\":\"2026-09-06T18:09:33.654949Z\",\"context\":\"\"},\"accepted_at\":\"2026-09-06T18:09:35.724866Z\"}",
+          "traceparent": "00-70cca26523f82ebbbcf086d8ffabbe03-3d01ba6719781d6c-03"
+        }
+      ]
+    ],
+    "worker_log": "worker-1  | {\"level\": \"INFO\", \"message\": \"processed exception_id=exc-5524750b-8979-53ae-bcac-49d03f2ae859 disposition=ACK\", \"service\": \"coldline-worker\", \"span_id\": \"35672640b8c9943a\", \"timestamp\": \"2026-09-06T18:09:36.068065+00:00\", \"trace_id\": \"70cca26523f82ebbbcf086d8ffabbe03\"}",
+    "worker_metrics": "coldline_exception_processing_duration_seconds_bucket{le=\"0.05\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"0.1\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"0.25\"} 0.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"0.5\"} 1.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"1.0\"} 1.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"2.5\"} 1.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"5.0\"} 1.0\ncoldline_exception_processing_duration_seconds_bucket{le=\"+Inf\"} 1.0\ncoldline_exception_processing_duration_seconds_count 1.0\ncoldline_exception_processing_duration_seconds_sum 0.342642\ncoldline_exception_processing_duration_seconds_created 1.7887179646359549e+09"
+  },
+  "source_evidence": {
+    "SRC-API": {
+      "kind": "source-excerpt",
+      "path": "src/api/use_cases.py",
+      "source_layer": "1.1",
+      "sha256_normalized_utf8": "66a09b2553c5bd3366b58e5db38aee9791ec604b2f9dce10927b97d2dbc43f20",
+      "first_line": 52,
+      "last_line": 126,
+      "text": "        \"\"\"Accept one out-of-range reading and schedule background work.\n\n        The order is deliberate:\n\n        1. Remove supplied PII before storage, logs, or provider use.\n        2. Derive the stable identity and reuse an existing workflow.\n        3. Persist ``QUEUED`` before making the message visible.\n        4. Publish exactly one job for the durable identity.\n\n        A retry returns the existing record. A publication failure becomes a\n        visible terminal state because silently losing accepted work is unsafe.\n        \"\"\"\n        reading = redact_sensor_reading(reading)\n        if not requires_exception(reading):\n            raise InRangeReading(\"reading is within its accepted handling range\")\n\n        exception_id = exception_id_for(reading)\n        existing = await self._repository.get(exception_id)\n        if existing is not None and existing.state is ExceptionState.FAILED:\n            raise TerminalExceptionConflict(f\"exception {exception_id} is already terminal FAILED\")\n        if existing is not None and existing.state is not ExceptionState.RECEIVED:\n            return existing\n\n        accepted_at = self._clock()\n        if existing is None:\n            record = await self._repository.create(\n                ExceptionRecord(\n                    exception_id=exception_id,\n                    reading=reading,\n                    state=ExceptionState.RECEIVED,\n                    accepted_at=accepted_at,\n                    updated_at=accepted_at,\n                )\n            )\n        else:\n            record = existing\n        if record.state is not ExceptionState.RECEIVED:\n            return record\n\n        # The worker must never observe work before the durable record says QUEUED.\n        try:\n            queued = await self._repository.transition(\n                exception_id,\n                {ExceptionState.RECEIVED},\n                ExceptionState.QUEUED,\n            )\n        except StateConflict:\n            concurrent = await self._repository.get(exception_id)\n            if concurrent is None:\n                raise\n            if concurrent.state is ExceptionState.FAILED:\n                raise TerminalExceptionConflict(\n                    f\"exception {exception_id} is already terminal FAILED\"\n                ) from None\n            return concurrent\n\n        # Publishing is the only external side effect owned by this use case.\n        try:\n            await self._queue.publish(\n                ExceptionJob(\n                    exception_id=exception_id,\n                    reading=reading,\n                    accepted_at=accepted_at,\n                )\n            )\n        except Exception as exc:\n            await self._repository.transition(\n                exception_id,\n                {ExceptionState.QUEUED},\n                ExceptionState.FAILED,\n                failure_reason=\"job_queue_unavailable\",\n            )\n            raise QueueUnavailable(\"job queue is unavailable\") from exc\n\n        return queued"
+    },
+    "SRC-ROUTES": {
+      "kind": "source-excerpt",
+      "path": "src/api/routes.py",
+      "source_layer": "1.1",
+      "sha256_normalized_utf8": "10167bbfa603675b7716e52c02a200879f842bfe9ff5d804deef899dc6b61ca3",
+      "first_line": 109,
+      "last_line": 137,
+      "text": "    async def accept_reading(reading: SensorReading) -> AcceptedReading:\n        \"\"\"Accept one synthetic exception reading for background processing.\"\"\"\n        try:\n            record = await application.accept(reading)\n        except InRangeReading as exc:\n            raise HTTPException(status_code=422, detail=str(exc)) from exc\n        except QueueUnavailable as exc:\n            raise HTTPException(status_code=503, detail=str(exc)) from exc\n        except TerminalExceptionConflict as exc:\n            raise HTTPException(status_code=409, detail=str(exc)) from exc\n        trace.get_current_span().set_attribute(\"coldline.exception_id\", record.exception_id)\n        return AcceptedReading(\n            exception_id=record.exception_id,\n            state=record.state.value,\n            status_url=f\"/api/v1/exceptions/{record.exception_id}\",\n        )\n\n    @app.get(\"/api/v1/exceptions/{exception_id}\", response_model=ExceptionRecord)\n    async def get_exception(exception_id: str) -> ExceptionRecord:\n        \"\"\"Return the durable state of one exception workflow.\"\"\"\n        record = await repository.get(exception_id)\n        if record is None:\n            raise HTTPException(status_code=404, detail=\"exception not found\")\n        return record\n\n    return app\n\n\ndef _route_label(path: str) -> str:"
+    },
+    "SRC-WORKER": {
+      "kind": "source-excerpt",
+      "path": "src/worker/use_cases.py",
+      "source_layer": "1.1",
+      "sha256_normalized_utf8": "d3a1c9fc4010f99ff67a1a1de088fa369d70a82969fa478a163894fa048516b2",
+      "first_line": 62,
+      "last_line": 118,
+      "text": "        if record is None:\n            return ProcessingDisposition.ACK_MISSING\n        if record.state in {ExceptionState.COMPLETED, ExceptionState.FAILED}:\n            return ProcessingDisposition.ACK_EXISTING\n        if record.state is ExceptionState.PROCESSING:\n            if delivery_count >= self._maximum_attempts:\n                await self._repository.transition(\n                    job.exception_id,\n                    {ExceptionState.PROCESSING},\n                    ExceptionState.FAILED,\n                    failure_reason=\"processing_attempts_exhausted\",\n                )\n                return ProcessingDisposition.ACK\n            return ProcessingDisposition.RETRY\n\n        # PROCESSING is durable before the provider call starts. Recovery can\n        # therefore distinguish work that never started from interrupted work.\n        await self._repository.transition(\n            job.exception_id,\n            {ExceptionState.QUEUED},\n            ExceptionState.PROCESSING,\n        )\n\n        try:\n            summary = await self._provider.summarize(\n                ModelRequest(\n                    exception_id=job.exception_id,\n                    shipment_id=job.reading.shipment_id,\n                    temperature_c=job.reading.temperature_c,\n                    allowed_min_c=job.reading.allowed_min_c,\n                    allowed_max_c=job.reading.allowed_max_c,\n                )\n            )\n        except Exception:\n            if delivery_count >= self._maximum_attempts:\n                await self._repository.transition(\n                    job.exception_id,\n                    {ExceptionState.PROCESSING},\n                    ExceptionState.FAILED,\n                    failure_reason=\"model_provider_exhausted\",\n                )\n                return ProcessingDisposition.ACK\n            await self._repository.transition(\n                job.exception_id,\n                {ExceptionState.PROCESSING},\n                ExceptionState.QUEUED,\n            )\n            return ProcessingDisposition.RETRY\n\n        # Terminal persistence happens before the transport loop acknowledges.\n        await self._repository.transition(\n            job.exception_id,\n            {ExceptionState.PROCESSING},\n            ExceptionState.COMPLETED,\n            summary=summary.summary,\n        )\n        return ProcessingDisposition.ACK"
+    },
+    "SRC-METRIC": {
+      "kind": "source-excerpt",
+      "path": "src/worker/metrics.py",
+      "source_layer": "1.2",
+      "sha256_normalized_utf8": "343accfcd79ba48a99110227a70b8b89bc9017f32d236703a48368511afcdcee",
+      "first_line": 37,
+      "last_line": 46,
+      "text": "\ndef observe_processing_duration(\n    accepted_at: datetime,\n    completed_at: datetime,\n    *,\n    request_id: str,\n) -> None:\n    \"\"\"Record the supplied opening-checkpoint processing observation.\"\"\"\n    elapsed = max(0.0, (completed_at - accepted_at).total_seconds() * 1000)\n    PROCESSING_DURATION.labels(request_id=request_id).observe(elapsed)"
+    },
+    "SRC-QUEUE": {
+      "kind": "source-excerpt",
+      "path": "src/adapters/queue/redis_streams.py",
+      "source_layer": "1.3",
+      "sha256_normalized_utf8": "99fc9417eca5b46023e702257516d11f26b4d3acebd7588e7bde9dec133551be",
+      "first_line": 80,
+      "last_line": 116,
+      "text": "        \"\"\"Read at most one new group delivery within the bounded wait.\n\n        Redis keeps the returned message in the pending list until the worker\n        explicitly acknowledges it after durable terminal persistence.\n        \"\"\"\n        result = await self._client.xreadgroup(\n            groupname=self._group,\n            consumername=self._consumer,\n            streams={self._stream: \">\"},\n            count=1,\n            block=block_ms,\n        )\n        if not result:\n            return None\n        _, messages = result[0]\n        message_id, fields = messages[0]\n        return JobDelivery(\n            message_id=_text(message_id),\n            job=decode_job(_field(fields, \"job\")),\n            delivery_count=1,\n            trace_carrier={},\n        )\n\n    async def claim_stale(self, *, minimum_idle_ms: int) -> JobDelivery | None:\n        \"\"\"Take ownership of one idle pending message for restart recovery.\n\n        The returned delivery count comes from Redis, not local memory. The use\n        case uses that durable count to enforce the three-attempt limit.\n        \"\"\"\n        result = await self._client.xautoclaim(\n            name=self._stream,\n            groupname=self._group,\n            consumername=self._consumer,\n            min_idle_time=minimum_idle_ms,\n            start_id=\"0-0\",\n            count=1,\n        )"
+    },
+    "SRC-RUNTIME": {
+      "kind": "source-excerpt",
+      "path": "src/worker/runtime.py",
+      "source_layer": "1.2",
+      "sha256_normalized_utf8": "b507438231e2fa8db719d5dc2591619bec0b05a14a2594dc2dbed2a62be3d487",
+      "first_line": 79,
+      "last_line": 114,
+      "text": "    with tracer.start_as_current_span(\"coldline.process_exception\", attributes=attributes):\n        disposition = await application.process(\n            delivery.job,\n            delivery_count=delivery.delivery_count,\n        )\n        if disposition in {\n            ProcessingDisposition.ACK,\n            ProcessingDisposition.ACK_EXISTING,\n            ProcessingDisposition.ACK_MISSING,\n        }:\n            await queue.acknowledge(delivery.message_id)\n        if disposition is ProcessingDisposition.ACK_MISSING:\n            LOGGER.warning(\n                \"acknowledging orphaned job exception_id=%s message_id=%s\",\n                delivery.job.exception_id,\n                delivery.message_id,\n            )\n        if disposition is ProcessingDisposition.ACK:\n            completed_at = datetime.now(UTC)\n            JOBS.inc()\n            observe_processing_duration(\n                delivery.job.accepted_at,\n                completed_at,\n                request_id=delivery.job.exception_id,\n            )\n        LOGGER.info(\n            \"processed exception_id=%s disposition=%s\",\n            delivery.job.exception_id,\n            disposition.value,\n        )\n\n\nasync def _update_queue_metrics(queue: JobQueue) -> None:\n    \"\"\"Refresh bounded queue diagnostic signals.\"\"\"\n    QUEUE_DEPTH.set(await queue.queue_depth())\n    QUEUE_PENDING.set(await queue.pending_count())"
+    }
+  },
+  "claims": {
+    "production_slo_met": "The repaired local captures establish the production p95 latency SLO.",
+    "business_outcome_unchanged": "Both exception captures completed with the same summary for equivalent synthetic shipment inputs."
+  }
+}
