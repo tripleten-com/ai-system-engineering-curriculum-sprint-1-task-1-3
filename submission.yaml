@@ -1,111 +1,279 @@
 # Coldline - Task 1.3
 # File: submission.yaml
-# Component: Structured student answer sheet
-# Purpose: Record bounded evidence interpretations.
-# Interacts With: Public schema and protected checker
-# Sprint/Task: Sprint 1 / Task 1.3
-# Concepts: Evidence interpretation and deterministic assessment
-# Tools: YAML
-# Use docs/student/evidence-pack.json for graded analysis.
-# Local experiments remain required practical work and final defense evidence.
-# Blank values are incomplete; no free-text field is graded.
-# Complete answers.
+# Edit only answer values in submission.yaml; keep the supplied keys and types.
+# Empty strings, nulls, and placeholder text are incomplete and fail verification.
+# Use submission-sample.yaml for YAML formatting only; do not copy its fictional values.
+# Do not include secrets, personal data, or local absolute paths.
+# Use docs/student/evidence-pack.json for assessed answers; retain your required local
+# investigations for the final defense.
+
 answers:
-  # Complete trace diagnosis.
+
+  # Task 1.3 — Step 1: Diagnosing missing spans and context propagation
+  # Diagnose the trace boundary using the before capture and the supplied source excerpts.
+  # Source: docs/student/evidence-pack.json; guidance: docs/student/evidence-guide.md.
+  #
+  # boundary options (use exact values):
+  # - api-to-queue-to-worker: The handoff from API publishing through the queue to worker
+  #   processing.
+  # - worker-to-model: The connection between worker processing and the model call.
+  # - api-to-database: The connection between API handling and database access.
+  #
+  # carrier options (use exact values):
+  # - not-injected-or-restored: Trace context is not injected into or restored from the queue
+  #   carrier.
+  # - propagated-correctly: Trace context is carried through the handoff and restored for
+  #   processing.
+  # - invalid-job-json: The queued job payload is not valid JSON.
+  #
+  # worker_context options (use exact values):
+  # - not-extracted: The processing span is started without extracting the incoming trace context.
+  # - extracted-parent: The processing span uses the parent extracted from incoming trace context.
+  # - no-worker-tracer: The worker has no tracer for creating its processing span.
+  #
+  # causal_claim options (use exact values):
+  # - observation: A fact directly present in a supplied record or source excerpt.
+  # - inference: An explanation drawn from the supplied evidence.
+  # - not-established: The claim needs evidence that the supplied records do not provide.
   trace_diagnosis:
     # Faulty context propagation boundary.
-    # Choices: api-to-queue-to-worker, worker-to-model, api-to-database
+    # Choose one string from the boundary options above.
     boundary:
     # Cause visible in queue source.
-    # Choices: not-injected-or-restored, propagated-correctly, invalid-job-json
+    # Choose one string from the carrier options above.
     carrier:
     # How the starter creates the processing span.
-    # Choices: not-extracted, extracted-parent, no-worker-tracer
+    # Choose one string from the worker_context options above.
     worker_context:
     # Classify the explanation that these source defects cause separate runtime traces.
-    # Choices: observation, inference, not-established
+    # Choose one string from the causal_claim options above.
     causal_claim:
-  # Complete metric diagnosis.
+
+  # Task 1.3 — Step 1: Diagnosing missing spans and context propagation
+  # Diagnose the before capture: observation conversion, growing metric dimensions, and their
+  # effect.
+  # Source: docs/student/evidence-pack.json; guidance: docs/student/evidence-guide.md.
+  #
+  # unit_fault options (use exact values):
+  # - seconds-multiplied-by-1000: The code multiplies a duration in seconds by 1000 before recording
+  #   it.
+  # - seconds-divided-by-1000: The code divides a duration in seconds by 1000 before recording it.
+  # - correct-seconds: The code records the duration in seconds without changing its unit.
+  #
+  # cardinality_fault options (use exact values):
+  # - per-exception-request-id: A label uses an identifier that differs between exceptions.
+  # - bounded-route: A label uses one of a limited set of route names.
+  # - none: No application label or dimension of the kind asked about is present.
+  #
+  # impact options (use exact values):
+  # - new-series-per-exception-and-inflated-duration: Each exception adds a series and recorded
+  #   durations exceed the intended seconds values.
+  # - missing-database-row: The application record is absent from the database.
+  # - no-impact: The defects have no effect on the behavior being assessed.
   metric_diagnosis:
     # Starter observation conversion.
-    # Choices: seconds-multiplied-by-1000, seconds-divided-by-1000, correct-seconds
+    # Choose one string from the unit_fault options above.
     unit_fault:
     # Starter dimension responsible for growth.
-    # Choices: per-exception-request-id, bounded-route, none
+    # Choose one string from the cardinality_fault options above.
     cardinality_fault:
     # Effect of the combined defects.
-    # Choices: new-series-per-exception-and-inflated-duration, missing-database-row, no-impact
+    # Choose one string from the impact options above.
     impact:
-  # Complete before trace evidence.
+
+  # Task 1.3 — Step 1: Diagnosing missing spans and context propagation
+  # Interpret trace continuity, the model span parent, and record correlation in the before capture.
+  # Source: docs/student/evidence-pack.json; guidance: docs/student/evidence-guide.md.
+  #
+  # continuity options (use exact values):
+  # - single-parent-chain: Publisher and processing spans belong to one trace with the expected
+  #   parent link.
+  # - separate-traces: Source and target spans use different trace IDs.
+  # - no-worker-span: No worker processing span is present in the supplied capture.
+  #
+  # model_parent options (use exact values):
+  # - worker-processing: The model span's parent is the worker processing span.
+  # - api-request: The model span's parent is the API request span.
+  # - no-parent: The model span has no parent reference.
+  #
+  # correlation_basis options (use exact values):
+  # - exception-id: Match the same durable exception identifier across records.
+  # - timestamp-proximity: Associate records because their timestamps are close together.
+  # - no-shared-identity: No common identifier links the supplied records.
+  #
+  # classification options (use exact values):
+  # - observation: A fact directly present in a supplied record or source excerpt.
+  # - inference: An explanation drawn from the supplied evidence.
+  # - not-established: The claim needs evidence that the supplied records do not provide.
   before_trace_evidence:
     # Compare actual publisher and processing span trace IDs and CHILD_OF references.
-    # Choices: single-parent-chain, separate-traces, no-worker-span
+    # Choose one string from the continuity options above.
     continuity:
     # Parent of model_provider.summarize.
-    # Choices: worker-processing, api-request, no-parent
+    # Choose one string from the model_parent options above.
     model_parent:
     # Shared durable identity linking HTTP, stream, worker and saved record.
-    # Choices: exception-id, timestamp-proximity, no-shared-identity
+    # Choose one string from the correlation_basis options above.
     correlation_basis:
     # Classification of the trace relationship directly visible in this capture.
-    # Choices: observation, inference, not-established
+    # Choose one string from the classification options above.
     classification:
-  # Complete after trace evidence.
+
+  # Task 1.3 — Step 2: Repairing span and trace telemetry defects
+  # Interpret trace continuity, the model span parent, and record correlation in the after capture.
+  # Source: docs/student/evidence-pack.json; guidance: docs/student/evidence-guide.md.
+  #
+  # continuity options (use exact values):
+  # - single-parent-chain: Publisher and processing spans belong to one trace with the expected
+  #   parent link.
+  # - separate-traces: Source and target spans use different trace IDs.
+  # - no-worker-span: No worker processing span is present in the supplied capture.
+  #
+  # model_parent options (use exact values):
+  # - worker-processing: The model span's parent is the worker processing span.
+  # - api-request: The model span's parent is the API request span.
+  # - no-parent: The model span has no parent reference.
+  #
+  # correlation_basis options (use exact values):
+  # - exception-id: Match the same durable exception identifier across records.
+  # - timestamp-proximity: Associate records because their timestamps are close together.
+  # - no-shared-identity: No common identifier links the supplied records.
+  #
+  # classification options (use exact values):
+  # - observation: A fact directly present in a supplied record or source excerpt.
+  # - inference: An explanation drawn from the supplied evidence.
+  # - not-established: The claim needs evidence that the supplied records do not provide.
   after_trace_evidence:
     # Compare actual publisher and processing span trace IDs and CHILD_OF references.
-    # Choices: single-parent-chain, separate-traces, no-worker-span
+    # Choose one string from the continuity options above.
     continuity:
     # Parent of model_provider.summarize.
-    # Choices: worker-processing, api-request, no-parent
+    # Choose one string from the model_parent options above.
     model_parent:
     # Shared durable identity linking HTTP, stream, worker and saved record.
-    # Choices: exception-id, timestamp-proximity, no-shared-identity
+    # Choose one string from the correlation_basis options above.
     correlation_basis:
     # Classification of the trace relationship directly visible in this capture.
-    # Choices: observation, inference, not-established
+    # Choose one string from the classification options above.
     classification:
-  # Complete before metric evidence.
+
+  # Task 1.3 — Step 1: Diagnosing missing spans and context propagation
+  # Interpret the observation unit, application labels, and dashboard query response in the before
+  # capture.
+  # Source: docs/student/evidence-pack.json; guidance: docs/student/evidence-guide.md.
+  #
+  # recorded_unit options (use exact values):
+  # - seconds: Durations are expressed in seconds.
+  # - milliseconds: Durations are expressed in thousandths of a second.
+  # - unknown: The supplied evidence does not establish the observation unit.
+  #
+  # application_labels options (use exact values):
+  # - none: No application label or dimension of the kind asked about is present.
+  # - request_id: An application label identifying an individual request.
+  # - shipment_id: An application label identifying a shipment.
+  #
+  # dashboard_result options (use exact values):
+  # - empty-vector: The query returns no time-series values.
+  # - finite-seconds-value: The query returns a finite numerical duration in seconds.
+  # - query-error: The query fails and returns an error.
+  #
+  # classification options (use exact values):
+  # - observation: A fact directly present in a supplied record or source excerpt.
+  # - inference: An explanation drawn from the supplied evidence.
+  # - not-established: The claim needs evidence that the supplied records do not provide.
   before_metric_evidence:
     # Unit of observations, considering source and accepted-to-terminal timestamps.
-    # Choices: seconds, milliseconds, unknown
+    # Choose one string from the recorded_unit options above.
     recorded_unit:
     # Application labels on the histogram, excluding Prometheus job/instance and bucket le.
-    # Choices: none, request_id, shipment_id
+    # Choose one string from the application_labels options above.
     application_labels:
     # Captured response to the published dashboard query.
-    # Choices: empty-vector, finite-seconds-value, query-error
+    # Choose one string from the dashboard_result options above.
     dashboard_result:
     # Classification of the query result directly visible in this capture.
-    # Choices: observation, inference, not-established
+    # Choose one string from the classification options above.
     classification:
-  # Complete after metric evidence.
+
+  # Task 1.3 — Step 3: Repairing metric cardinality and dashboard defects
+  # Interpret the observation unit, application labels, and dashboard query response in the after
+  # capture.
+  # Source: docs/student/evidence-pack.json; guidance: docs/student/evidence-guide.md.
+  #
+  # recorded_unit options (use exact values):
+  # - seconds: Durations are expressed in seconds.
+  # - milliseconds: Durations are expressed in thousandths of a second.
+  # - unknown: The supplied evidence does not establish the observation unit.
+  #
+  # application_labels options (use exact values):
+  # - none: No application label or dimension of the kind asked about is present.
+  # - request_id: An application label identifying an individual request.
+  # - shipment_id: An application label identifying a shipment.
+  #
+  # dashboard_result options (use exact values):
+  # - empty-vector: The query returns no time-series values.
+  # - finite-seconds-value: The query returns a finite numerical duration in seconds.
+  # - query-error: The query fails and returns an error.
+  #
+  # classification options (use exact values):
+  # - observation: A fact directly present in a supplied record or source excerpt.
+  # - inference: An explanation drawn from the supplied evidence.
+  # - not-established: The claim needs evidence that the supplied records do not provide.
   after_metric_evidence:
     # Unit of observations, considering source and accepted-to-terminal timestamps.
-    # Choices: seconds, milliseconds, unknown
+    # Choose one string from the recorded_unit options above.
     recorded_unit:
     # Application labels on the histogram, excluding Prometheus job/instance and bucket le.
-    # Choices: none, request_id, shipment_id
+    # Choose one string from the application_labels options above.
     application_labels:
     # Captured response to the published dashboard query.
-    # Choices: empty-vector, finite-seconds-value, query-error
+    # Choose one string from the dashboard_result options above.
     dashboard_result:
     # Classification of the query result directly visible in this capture.
-    # Choices: observation, inference, not-established
+    # Choose one string from the classification options above.
     classification:
-  # Complete behavior and limits.
+
+  # Task 1.3 — Step 3: Repairing metric cardinality and dashboard defects
+  # Compare business outcomes across the supplied before/after captures and classify the claims
+  # those records support.
+  # Source: docs/student/evidence-pack.json; guidance: docs/student/evidence-guide.md.
+  #
+  # exception_state options (use exact values):
+  # - COMPLETED: The exception job has finished successfully.
+  # - FAILED: The exception job has reached a failed state.
+  # - QUEUED: The exception job is waiting for processing.
+  #
+  # normal_http_status options (use exact values):
+  # - 200: HTTP OK: the request succeeded.
+  # - 202: HTTP Accepted: the request was accepted for processing.
+  # - 422: HTTP Unprocessable Content: the request content failed validation.
+  # - 500: HTTP Internal Server Error: the server encountered an error.
+  #
+  # summary_comparison options (use exact values):
+  # - unchanged-for-equivalent-input: Equivalent inputs produce the same summary before and after
+  #   the repair.
+  # - missing-after: The after capture has no corresponding summary.
+  # - different-condition: The compared summaries concern different input conditions.
+  #
+  # business_claim_classification / production_slo_claim options (use exact values):
+  # - observation: A fact directly present in a supplied record or source excerpt.
+  # - inference: An explanation drawn from the supplied evidence.
+  # - not-established: The claim needs evidence that the supplied records do not provide.
   behavior_and_limits:
     # Terminal state in both captures.
-    # Choices: COMPLETED, FAILED, QUEUED
+    # Choose one string from the exception_state options above.
     exception_state:
     # In-range POST status in both captures.
-    # Choices: 200, 202, 422, 500
+    # Choose one integer from the normal_http_status options above.
     normal_http_status:
     # Compare captured summaries for the same synthetic shipment and temperature.
-    # Choices: unchanged-for-equivalent-input, missing-after, different-condition
+    # Choose one string from the summary_comparison options above.
     summary_comparison:
     # Classification of the captured state/status/summary comparison.
-    # Choices: observation, inference, not-established
+    # Choose one string from the business_claim_classification / production_slo_claim options above.
+    # Source: docs/student/evidence-pack.json, claims.business_outcome_unchanged.
     business_claim_classification:
     # Does the pack establish the production p95 latency SLO?
-    # Choices: observation, inference, not-established
+    # Choose one string from the business_claim_classification / production_slo_claim options above.
+    # Source: docs/student/evidence-pack.json, claims.production_slo_met.
     production_slo_claim:
