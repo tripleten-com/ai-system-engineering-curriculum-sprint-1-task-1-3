@@ -58,7 +58,7 @@ poe verify
 | `poe e2e` | Run the external API-to-worker workflow |
 | `poe verify` | Run the public student verification path |
 | `poe telemetry-repair` | Check the two telemetry repairs against the running stack |
-| `poe restart` | Restart API and worker processes |
+| `poe restart` | Restart the existing API and worker containers **without rebuilding**; run `poe start` instead after editing source |
 | `poe stop` | Remove containers and the network, keeping named volumes |
 | `poe reset` | Remove containers, the network, and local named volumes |
 
@@ -139,25 +139,37 @@ runtime evidence rather than from this guide.
 
 ## Task boundary
 
-Task 1.3 asks you to repair — not just diagnose — two telemetry defects: a broken trace-context
-propagation between the API and the worker, and an unbounded metric label with the wrong unit.
+Diagnose and repair exactly two assigned telemetry defects: trace-context propagation and the processing-duration metric. Preserve business behavior.
 
-Only these paths are student-editable (see the
-[Task 1.3 contract](docs/student/task-1-3-contract.md) for the full detail):
+Only these paths are student-editable:
 
 - `src/adapters/queue/redis_streams.py`
 - `src/worker/runtime.py`
 - `src/worker/metrics.py`
 - `submission.yaml`
 
-The public verifier checks answer structure and completeness. It cannot grade engineering judgment. The
-instructor reviews the quality of the evidence and reasoning.
+Read [the evidence guide](docs/student/evidence-guide.md) and the versioned
+[fixed evidence pack](docs/student/evidence-pack.json) before completing `submission.yaml`.
+The sheet and its fictional sample show exact objects, values, and units. Graded
+analysis comes from this supplied pack; actual local investigations remain required
+and provide evidence for the final instructor defense. Keep those sources distinct.
+
+The public verifier checks answer structure, permitted changes, and the Task's
+published runtime behavior and public arithmetic checks. Protected automated answer
+checks establish semantic correctness against the public fixed pack. These protected
+answer checks are distinct from the single Task 1.6 held-out runtime scenario.
+Deterministic CI accepts Task
+answers; there is no separate instructor Task-answer grade. Green required public and protected CI opens
+the next Task. Sprint completion requires all six Task PRs CI-green and one final
+instructor defense covering empirical reasoning, uncertainty, alternatives, and judgment.
 
 ### Student walkthrough
 
-See **Task 1.3: Observability Repairs** in your course platform for the full walkthrough. In outline: fix trace propagation so the worker span joins the API trace,
-fix the metric so it uses a bounded label and the correct unit, run `poe verify`, then document your
-diagnosis, repair, and before/after evidence in `submission.yaml`.
+Capture actual before evidence, repair only the permitted trace and metric code, rebuild with `poe start`, and run `poe telemetry-repair` and `poe e2e` for fresh after evidence. Complete the diagnosis, before/after interpretation, and business-behavior/limits objects from the fixed pack. The PR diff and runtime tests prove the repairs; no free-text repair description is submitted.
+
+Run `./.tools/bin/uv run --frozen poe verify` from the repository root before
+submitting a feature-branch PR against `main`. See the course Task lesson for the
+three-Step walkthrough and exact matching acceptance/self-review criteria.
 
 ## Operational limits
 
